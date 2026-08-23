@@ -15,13 +15,10 @@ Healthcare scheduling is usually clunky: phone calls, double bookings, no visibi
 ## Screenshots
 
 **Landing page**
-![MediSlot landing page](packages/screenshots/hero.png)
-
-**How it works**
-![How MediSlot works](packages/screenshots/how-it-works.png)
+![MediSlot landing page](screenshots/Hero.png)
 
 **AI-powered pre-visit summary**
-![AI pre-visit summary](packages/screenshots/ai-previsit.png)
+![AI pre-visit summary](screenshots/Ai_PreViSIT.png)
 
 ---
 
