@@ -1,0 +1,61 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+build
+.next
+.turbo
+coverage
+.cache
+
+# Environment variables (SECRETS - NEVER COMMIT!)
+.env
+.env.local
+.env.production.local
+.env.*.local
+
+# System files
+.DS_Store
+*.log
+
+# Temporary files
+mdFiles
+toBeFixed.txt
+Testing.txt
+
+# Large PDFs
+Healthcare_Appointment_Manager (1) (2).pdf
+
+# Old documentation (outdated, ignore these)
+DARK_MODE_IMPLEMENTATION.md
+FINAL_PROJECT_ANALYSIS.md
+TESTING_GUIDE.md 
+APPOINTMENT_DIAGNOSIS.md
+BOOKING_UI_FIX.md
+FIXES_COMPLETED.md
+PROFILE_MENU_IMPROVEMENT.md
+CALENDAR_INTEGRATION_GUIDE.md
+MEDICATION_CALENDAR_SYNC.md
+DOCTOR_DELETION_FIX.md
+DEPLOYMENT_SUMMARY.md
+DEPLOYMENT_GUIDE.md
+QUICK_DEPLOY_STEPS.md
+PRE_DEPLOYMENT_CHECKLIST.md
+screenshots\SCREENSHOT_CHECKLIST.md
+
+# IMPORTANT: Do NOT ignore these files below!
+# They should be committed to Git:
+# - package.json (all of them)
+# - pnpm-lock.yaml
+# - pnpm-workspace.yaml
+# - .npmrc
+# - .prettierrc
+# - render.yaml
+# - deploy.ps1
+# - DEPLOYMENT_GUIDE.md
+# - QUICK_DEPLOY_STEPS.md
+# - DEPLOYMENT_SUMMARY.md
+# - PRE_DEPLOYMENT_CHECKLIST.md
+# - MEDICATION_CALENDAR_SYNC.md
+# - DOCTOR_DELETION_FIX.md

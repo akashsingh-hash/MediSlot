@@ -1,0 +1,51 @@
+services:
+  # Backend API Service
+  - type: web
+    name: medislot-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: |
+      cd packages/database && pnpm install && pnpm prisma generate && cd ../../apps/api && pnpm install && pnpm run build
+    startCommand: cd apps/api && node dist/main.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: AUTH_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: MediSlot <onboarding@resend.dev>
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+    healthCheckPath: /
+
+  # Frontend Web Service (Optional - can use Vercel instead)
+  # Uncomment if you want to deploy frontend on Render too
+  # - type: web
+  #   name: medislot-web
+  #   env: node
+  #   region: oregon
+  #   plan: free
+  #   buildCommand: cd apps/web && pnpm install && pnpm run build
+  #   startCommand: cd apps/web && pnpm run start
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production
+  #     - key: NEXT_PUBLIC_API_URL
+  #       sync: false

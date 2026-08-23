@@ -1,0 +1,23 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="medislot-grad" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0d9488" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <filter id="medislot-shadow" x="-10%" y="-10%" width="120%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0d9488" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <rect width="180" height="180" rx="38" fill="url(#medislot-grad)"/>
+  <!-- Medical Plus / Calendar Slot Symbol -->
+  <g filter="url(#medislot-shadow)">
+    <!-- Calendar Shape Base -->
+    <rect x="42" y="52" width="96" height="84" rx="18" fill="white" fill-opacity="0.96"/>
+    <rect x="42" y="52" width="96" height="24" rx="18" fill="#042f2e" fill-opacity="0.12"/>
+    <!-- Binder Rings -->
+    <rect x="62" y="44" width="8" height="16" rx="4" fill="white"/>
+    <rect x="110" y="44" width="8" height="16" rx="4" fill="white"/>
+    <!-- Medical Cross inside Slot -->
+    <path d="M90 76V114M71 95H109" stroke="#0d9488" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

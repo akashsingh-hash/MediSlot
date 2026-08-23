@@ -1,0 +1,15 @@
+{
+  "name": "medislot",
+  "version": "1.0.0",
+  "description": "MediSlot - Smart Healthcare Appointment & Patient Care Platform",
+  "main": "index.js",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module"
+}
