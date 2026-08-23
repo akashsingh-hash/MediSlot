@@ -1,268 +1,213 @@
-# 🏥 MediSlot — Smart Healthcare Appointment & Patient Care Platform
+# MediSlot
 
-<div align="center">
+**Smart Healthcare Appointment & Patient Care Platform**
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-16.3-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![NestJS](https://img.shields.io/badge/NestJS-11.0-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.3-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Prisma](https://img.shields.io/badge/Prisma-5.0-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
-[![Google Gemini](https://img.shields.io/badge/Gemini_AI-1.5-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-
-**MediSlot is a modern, full-stack healthcare platform connecting patients, doctors, and administrators through intelligent appointment scheduling, patient management, AI-assisted pre-visit insights, medication reminders, and secure clinical communication.**
-
-[✨ Features](#-key-features) • [🏛️ Architecture](#%EF%B8%8F-system-architecture) • [🛠️ Tech Stack](#%EF%B8%8F-tech-stack) • [🚀 Quick Start](#-local-development-setup) • [🔐 Security](#-security--reliability)
-
-</div>
+MediSlot connects patients, doctors, and administrators through intelligent appointment scheduling, AI-assisted visit preparation, medication tracking, and secure in-app communication — built as a modern, production-style full-stack healthcare platform.
 
 ---
 
-## 📸 Platform Showcase
+## Overview
 
-### Modern Clinical Experience
-- **Responsive Landing Page**: Sleek presentation with clear value propositions, interactive role showcases, and intuitive navigation.
-- **Patient Workspace**: Real-time next appointment alerts, dynamic health pulse, medication adherence tracking, and quick booking triggers.
-- **Clinician Workspace**: Daily agenda queues, patient consultation records, digital prescription generation, and leave management.
-- **Administrator Hub**: Platform KPI statistics, verified practitioner management, leave approvals, and system service health metrics.
-- **AI Pre-Visit Summarizer**: Automatic structuring of patient symptoms into urgency indicators, chief complaints, and suggested clinician questions.
-- **Two-Way Google Calendar Sync**: Real-time appointment integration directly to patient and doctor calendars via OAuth 2.0.
+Healthcare scheduling is usually clunky: phone calls, double bookings, no visibility into doctor availability, and zero prep before a visit. MediSlot fixes that with a real-time booking engine, AI-generated pre-visit summaries, two-way Google Calendar sync, and role-specific dashboards for patients, doctors, and admins.
 
 ---
 
-## 🎯 Key Features
+## Screenshots
 
-### 👤 Patient Experience
-- **Intelligent Doctor Discovery**: Search clinicians by specialty (Cardiology, Neurology, Dermatology, General Medicine, Pediatrics, etc.), availability, and experience.
-- **Real-Time Booking**: Interactive slot picker with concurrency locking to prevent double bookings.
-- **AI Pre-Visit Intake**: Structured symptom descriptions to assist doctor consultation preparation.
-- **Prescriptions & Medication Tracker**: Full visibility into active dosages, frequencies, duration countdowns, and refill schedules.
-- **Direct Care Messaging**: In-app messaging with attending physicians.
-- **Two-Way Calendar Sync**: Automatic sync of scheduled consultations and reminders to Google Calendar.
+**Landing page**
+![MediSlot landing page](packages/screenshots/hero.png)
 
-### 🩺 Doctor Workspace
-- **Daily Clinical Schedule**: Live patient queue showing appointment statuses (Held, Confirmed, Completed, Cancelled).
-- **Patient Medical History**: Longitudinal view of past visits, notes, and previous medications.
-- **Digital Prescription Drawer**: Fast prescription authoring directly attached to completed consultations.
-- **Availability & Leave Management**: Configurable working hours, slot durations, and conflict-free leave scheduling.
-- **AI Clinical Support**: Pre-generated symptom briefs and structured discussion guides for upcoming visits.
+**How it works**
+![How MediSlot works](packages/screenshots/how-it-works.png)
 
-### 🛡️ Administrator Operations
-- **System KPIs**: Live analytics on total patients, verified practitioners, appointment completion rates, and cancellation ratios.
-- **Practitioner Directory**: Onboard, edit, and manage doctor credentials and schedules.
-- **Leave Resolution**: Manage doctor leave requests with automatic rescheduling alerts for affected patients.
-- **Service Health Monitoring**: Real-time operational status for API services, database connectivity, and background queues.
+**AI-powered pre-visit summary**
+![AI pre-visit summary](packages/screenshots/ai-previsit.png)
 
 ---
 
-## 🏛️ System Architecture
+## Core Modules
 
-```mermaid
-graph TD
-    User([Client / Browser]) <--> |Next.js 16 App Router| WebApp[MediSlot Web UI]
-    WebApp <--> |REST API / JWT| FastifyAPI[NestJS + Fastify API]
-    
-    subgraph Core Services
-        FastifyAPI <--> |Prisma ORM| Postgres[(PostgreSQL Database)]
-        FastifyAPI <--> |BullMQ / ioredis| RedisQueue[(Redis Queue)]
-    end
-    
-    subgraph Third-Party Integrations
-        FastifyAPI <--> |REST API| Gemini[Google Gemini AI]
-        FastifyAPI <--> |OAuth 2.0 API| GCalendar[Google Calendar API]
-        FastifyAPI <--> |SDK| ResendEmail[Resend Transactional Email]
-    end
-```
-
-### Key Architectural Patterns
-1. **Concurrency Protection (P2002 Lock)**: Uses PostgreSQL unique composite constraints (`[doctorId, startTime]`) within atomic database transactions to eliminate race conditions and double-bookings.
-2. **Transactional Outbox Pattern**: Asynchronous background jobs (emails, calendar updates, AI briefs) are queued in the database within the booking transaction, guaranteeing zero data loss or partial failures.
-3. **Graceful AI Fallbacks**: Gemini AI summaries execute asynchronously via BullMQ; if the AI service experiences latency, consultations proceed uninterrupted with raw patient notes.
+| Module | What it does |
+|---|---|
+| **Appointment Engine** | Live slot availability, a 15-minute hold window during checkout, and a `HELD → CONFIRMED → COMPLETED` status pipeline that prevents double-booking. |
+| **AI Visit Assistant** | Uses Gemini to read a patient's stated symptoms and generate an urgency tag (High/Medium/Low), a clean summary of the chief complaint, and a short list of questions the doctor might want to ask. Clearly labeled as AI-generated, never a diagnosis. |
+| **Calendar Sync** | Two-way Google Calendar integration — appointments and medication reminders both show up as color-coded calendar events with their own notification timing. |
+| **Medication & Prescriptions** | Doctors issue prescriptions with dosage/frequency; MediSlot auto-generates a reminder schedule and pushes it to the patient's calendar. |
+| **Messaging** | Lightweight in-app chat between doctors and patients, with unread badges and a notification center. |
+| **Admin Console** | Doctor onboarding, leave approval, platform-wide metrics, and account management. |
 
 ---
 
-## 🛠️ Tech Stack
+## Roles
 
-| Layer | Technology | Description |
-| :--- | :--- | :--- |
-| **Frontend** | [Next.js 16](https://nextjs.org/) (React 19) | Modern React framework with App Router & Server Components |
-| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) | Clinical SaaS design system with light/dark theme support |
-| **UI Components** | [Radix UI](https://www.radix-ui.com/) & [Lucide Icons](https://lucide.dev/) | Accessible primitives and modern icon set |
-| **State & Data** | [TanStack React Query](https://tanstack.com/query) | Client-side async cache and mutation handling |
-| **Backend API** | [NestJS 11](https://nestjs.com/) + [Fastify](https://www.fastify.io/) | High-performance modular backend framework |
-| **Database ORM** | [Prisma 5](https://www.prisma.io/) + [PostgreSQL](https://www.postgresql.org/) | Type-safe database queries and migrations |
-| **Queue / Cache** | [BullMQ](https://bullmq.io/) + [Redis](https://redis.io/) | Resilient background processing and transactional outbox |
-| **Artificial Intelligence** | [Google Gemini 1.5](https://ai.google.dev/) | Pre-visit symptom structuring & doctor intake briefing |
-| **Calendar Sync** | [Google Calendar API](https://developers.google.com/calendar) | 2-way OAuth 2.0 appointment and reminder sync |
-| **Email Service** | [Resend](https://resend.com/) | Transactional appointment notifications and reschedule alerts |
-| **Monorepo Tooling** | [pnpm Workspaces](https://pnpm.io/) | Fast, isolated package dependency management |
+**Patients** can search doctors, book and manage appointments, view AI-prepped visit summaries, track medications, and message their doctor directly.
+
+**Doctors** get a schedule-first workspace: today's queue, availability controls, leave requests that auto-block slots, patient history, and prescription creation.
+
+**Admins** oversee the platform: doctor accounts, leave requests, usage metrics, and system health.
 
 ---
 
-## 📁 Repository Structure
+## Tech Stack
+
+**Frontend** — Next.js 16 (React 19), TypeScript, Tailwind CSS, shadcn/ui + Radix primitives, TanStack Query, Framer Motion, React Hook Form
+
+**Backend** — NestJS on Fastify, TypeScript, Prisma ORM, PostgreSQL, Redis + BullMQ for background jobs, JWT auth with Argon2 password hashing, Swagger/OpenAPI
+
+**Integrations** — Google Gemini (AI insights), Google Calendar API + OAuth 2.0, Resend (transactional email)
+
+**Tooling** — pnpm monorepo, Prisma migrations, deployable to any Node host (Vercel for frontend, Railway/Render/Fly for backend are all supported — no vendor lock-in)
+
+---
+
+## Project Structure
 
 ```
-medislot/
+MediSlot/
 ├── apps/
-│   ├── api/                     # NestJS Backend API
-│   │   ├── src/
-│   │   │   ├── admin/           # Admin metrics and doctor management
-│   │   │   ├── appointments/    # Slot booking, hold locks, state machine
-│   │   │   ├── auth/            # JWT authentication & password hashing
-│   │   │   ├── calendar/        # Google Calendar OAuth2 integration
-│   │   │   ├── doctors/         # Clinician discovery, profiles & slots
-│   │   │   ├── email/           # Resend email notification provider
-│   │   │   ├── llm/             # Google Gemini AI symptom analyzer
-│   │   │   ├── medications/     # Prescription and reminder tracking
-│   │   │   ├── messages/        # Direct patient-doctor messaging
-│   │   │   ├── prisma/          # Database client service
-│   │   │   └── queue/           # BullMQ outbox event worker
-│   │   └── package.json
-│   └── web/                     # Next.js 16 Frontend App
-│       ├── app/                 # App Router pages and layout
-│       ├── components/          # Dashboards, modals, and landing views
-│       ├── hooks/               # Custom React hooks
-│       ├── lib/                 # API client and utility helpers
-│       └── package.json
+│   ├── api/                  # NestJS backend
+│   │   └── src/
+│   │       ├── admin/
+│   │       ├── appointments/
+│   │       ├── auth/
+│   │       ├── calendar/
+│   │       ├── doctors/
+│   │       ├── llm/          # Gemini integration
+│   │       ├── medications/
+│   │       ├── messages/
+│   │       ├── prescriptions/
+│   │       ├── queue/        # BullMQ jobs
+│   │       └── prisma/
+│   └── web/                  # Next.js frontend
+│       ├── app/
+│       ├── components/
+│       ├── lib/
+│       └── public/
 ├── packages/
-│   ├── database/                # Prisma schema, client, and seeders
-│   └── shared/                  # Shared Zod validation schemas
-├── docs/                        # Architecture and integration guides
-├── .env.example                 # Root environment template
-├── package.json                 # Monorepo root configuration
-└── pnpm-workspace.yaml          # pnpm workspace definition
+│   ├── database/             # Prisma schema + migrations
+│   └── shared/                # Shared types
+└── docs/
 ```
 
 ---
 
-## 🚀 Local Development Setup
+## Getting Started
 
-### 1. Prerequisites
-Ensure the following tools are installed on your machine:
-- **Node.js**: `v20.x` or `v22.x` (LTS recommended)
-- **pnpm**: `v9.x` or `v10.x` (`npm install -g pnpm`)
-- **PostgreSQL**: Local database instance or cloud provider ([Neon](https://neon.tech), Supabase)
-- **Redis**: Local instance or cloud provider ([Upstash](https://upstash.com))
+### Prerequisites
 
----
+- Node.js 20 LTS+
+- pnpm 8+
+- PostgreSQL (local or hosted — Neon, Supabase, RDS)
+- Redis (local or hosted — Upstash)
+- A Google Cloud project (Calendar API + Gemini access)
+- A Resend account (email delivery)
 
-### 2. Installation
-Clone the repository and install all workspace dependencies:
+### 1. Clone and install
 
 ```bash
-# Install all workspace dependencies
+git clone <your-fork-url> medislot
+cd medislot
 pnpm install
 ```
 
----
+### 2. Configure environment variables
 
-### 3. Environment Configuration
-Create the `.env` file from the provided template:
+Create `.env` files at the root and in `apps/api/`. See **Configuration Reference** below for the full variable list — copy `.env.example` and fill in your own values. Never commit real secrets.
 
-```bash
-# Copy example configuration to root
-cp .env.example .env
-```
-
-Configure your `.env` variables:
-
-```env
-# Database (PostgreSQL)
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/medislot?schema=public"
-
-# Redis
-REDIS_URL="redis://localhost:6379"
-
-# Authentication
-AUTH_SECRET="your-super-secret-jwt-key-replace-in-production"
-PORT=3001
-
-# AI (Google Gemini)
-GEMINI_API_KEY="your-gemini-api-key"
-
-# Email (Resend)
-RESEND_API_KEY="re_your_api_key"
-EMAIL_FROM="MediSlot <notifications@medislot.demo>"
-
-# Google Calendar OAuth 2.0
-GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET="your-client-secret"
-GOOGLE_REDIRECT_URI="http://localhost:3001/calendar/callback"
-
-# Frontend API URL
-NEXT_PUBLIC_API_URL="http://localhost:3001"
-```
-
----
-
-### 4. Database Setup & Seeding
+### 3. Set up the database
 
 ```bash
-# Generate the Prisma client
-pnpm --filter @medislot/database db:generate
-
-# Push schema changes to your database
-pnpm --filter @medislot/database db:push
-
-# (Optional) Seed sample doctors, patients, and slots
-pnpm --filter @medislot/database db:seed
+cd packages/database
+pnpm prisma generate
+pnpm prisma db push
+pnpm prisma db seed   # optional
 ```
 
----
-
-### 5. Running the Application
-
-Start both the backend API and frontend web application concurrently:
+### 4. Run the app
 
 ```bash
-# Start all workspace applications in development mode
-pnpm dev
+# from the repo root — runs frontend + backend together
+pnpm run dev
 ```
 
-| Application | URL | Description |
-| :--- | :--- | :--- |
-| **Frontend Web** | `http://localhost:3000` | Landing page and application dashboard |
-| **Backend API** | `http://localhost:3001` | Fastify REST API |
-| **Swagger API Docs** | `http://localhost:3001/api/docs` | Interactive OpenAPI documentation |
+Or run each service separately:
+
+```bash
+cd apps/api && pnpm run dev     # backend
+cd apps/web && pnpm run dev     # frontend
+```
+
+### 5. Open it
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:3001 |
+| API docs (Swagger) | http://localhost:3001/api/docs |
+| Prisma Studio | `pnpm prisma studio` from `packages/database` |
 
 ---
 
-## 🧪 Demo Test Accounts
+## Configuration Reference
 
-When running in development mode, the login screen includes quick demo buttons:
+| Variable | Purpose | Required |
+|---|---|---|
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `REDIS_URL` | Redis connection for background jobs | Yes |
+| `AUTH_SECRET` | JWT signing secret — generate with `openssl rand -hex 32` | Yes |
+| `PORT` | Backend port (default `3001`) | Yes |
+| `NODE_ENV` | `development` / `production` | Yes |
+| `GEMINI_API_KEY` | Google AI Studio key for visit-summary generation | Yes |
+| `RESEND_API_KEY` | Email delivery for confirmations/reminders | Yes |
+| `EMAIL_FROM` | Sender address on outgoing email | Yes |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials for Calendar sync | Yes, if using Calendar sync |
+| `GOOGLE_REDIRECT_URI` | OAuth callback URL | Yes, if using Calendar sync |
+| `NEXT_PUBLIC_API_URL` | Backend URL the frontend calls | Yes |
 
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| **Patient** | `patient@demo.local` | `demo123` |
-| **Doctor** | `doctor@demo.local` | `demo123` |
-| **Admin** | `admin@demo.local` | `demo123` |
-
----
-
-## 🔐 Security & Reliability
-
-- **JWT Authentication**: Signed JSON Web Tokens with configurable expiration and secure HTTP header transport.
-- **Password Security**: Strong hashing via bcrypt / argon2.
-- **Role-Based Access Control (RBAC)**: Strict endpoint guards for `PATIENT`, `DOCTOR`, and `ADMIN` roles.
-- **Race Condition Prevention**: Database-level unique constraints preventing overlapping reservations.
-- **Safe AI Design**: AI features are explicitly marked as assistive clinical support tools and do not produce autonomous medical diagnoses.
+Full setup notes for each provider (Neon, Upstash, Google Cloud Console, Resend) are documented in `/docs`.
 
 ---
 
-## 🔮 Future Roadmap
+## Deployment
 
-- [ ] Telehealth video consultations with WebRTC / Daily.co
-- [ ] Multi-clinic and multi-tenant department routing
-- [ ] Patient EHR / Medical record PDF uploads
-- [ ] Digital prescription electronic signature verification
-- [ ] Automated SMS / WhatsApp consultation reminders
-- [ ] Multi-language internationalization (i18n)
+MediSlot is deployment-agnostic. A common split:
+
+- **Frontend** → Vercel, with root directory set to `apps/web` and `NEXT_PUBLIC_API_URL` pointed at your backend.
+- **Backend** → any Node host that supports long-running processes (Railway, Render, Fly.io) with the environment variables above configured.
+- **Database** → Neon, Supabase, or self-hosted PostgreSQL.
+- **Redis** → Upstash or self-hosted.
 
 ---
 
-## 👨‍💻 Developer & License
+## Roadmap
 
-Developed as an independent software project by **Akash Singh**.
+- Video consultations (Zoom / Google Meet)
+- Multi-language support
+- Patient medical record uploads
+- Lab result integration
+- Payment + insurance verification
+- Native mobile app
+- WhatsApp notification channel
+- Multi-clinic support
 
-Distributed under the **MIT License**.
-#   M e d i S l o t  
- 
+---
+
+## Contributing
+
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes
+4. Open a pull request
+
+---
+
+## Developer
+
+**Akash Singh**
+Developed as an independent software project.
+
+---
+
+## Acknowledgments
+
+Built on top of [Next.js](https://nextjs.org/), [NestJS](https://nestjs.com/), [Prisma](https://www.prisma.io/), [shadcn/ui](https://ui.shadcn.com/), and [Google Gemini](https://deepmind.google/technologies/gemini/).
